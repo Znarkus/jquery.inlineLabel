@@ -4,6 +4,8 @@ jquery.inlineLabel
 Converts existing `<label>` to inline labels, kind of like the 
 [`placeholder`](http://www.w3schools.com/html5/tryit.asp?filename=tryhtml5_input_placeholder) HTML5 attribute.
 
+[Try the demo!](http://jsfiddle.net/Znarkus/x2NFe/)
+
     $('label').inlineLabel();
 
 This will position the label elements on top of the inputs, and copy their style. 
