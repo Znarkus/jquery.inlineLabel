@@ -1,4 +1,4 @@
-/* jquery.alignTo - License https://github.com/Znarkus/jquery.inlineLabel */
+/* jquery.inlineLabel - License https://github.com/Znarkus/jquery.inlineLabel */
 
 (function ($) {
 	
@@ -22,7 +22,7 @@
 	
 	function _labels_input($label) {
 		if (_input_in_label($label)) {
-			return $('input', $label);
+			return $('input, textarea', $label);
 		} else {
 			return $('#' + $label.attr('for'));
 		}
@@ -79,7 +79,8 @@
 		$label.css({
 			position: 'absolute',
 			width: $input.width() + 'px',
-			height: $input.height() + 'px'
+			height: $input.css('height')
+			//boxSizing: 'content-box'
 		});
 		
 		pos = $input.position();
@@ -118,14 +119,14 @@
 		}
 	}
 	
-	function _label_tone_down($label) {
+	function _label_tone_down($label, options) {
 		_label_show_invisibly($label);
-		$label.stop().animate({ opacity: 0.2 }, 100);
+		$label.stop().animate({ opacity: options.opacity.focus }, 100);
 	}
 	
-	function _label_activate($label) {
+	function _label_activate($label, options) {
 		_label_show_invisibly($label);
-		$label.stop().animate({ opacity: 0.5 }, 100);
+		$label.stop().animate({ opacity: options.opacity.blur }, 100);
 	}
 	
 	function _label_hide($label) {
@@ -143,11 +144,11 @@
 			_label_hide($label);
 		} else {
 			if (options && options.override_focus) {
-				_label_tone_down($label);
+				_label_tone_down($label, options);
 			} else if ($input.is(':focus')) {
-				_label_tone_down($label);
+				_label_tone_down($label, options);
 			} else {
-				_label_activate($label);
+				_label_activate($label, options);
 			}
 		}
 	}
@@ -163,6 +164,10 @@
 	function InlineLabel($label, options) {
 		var $input = _labels_input($label);
 		
+		options = $.extend(true, {}, {
+			opacity: { focus: 0.2, blur: 0.5 }
+		}, options);
+		
 		if (_input_in_label($label)) {
 			$label = $('span', $label);
 		}
@@ -174,10 +179,10 @@
 		$input.focus(function () {
 			// Must override focus detection, because $input
 			// actually doesn't have focus yet
-			_check_input_value($input, $label, { override_focus: true });
+			_check_input_value($input, $label, $.extend({}, options, { override_focus: true }));
 			
 		}).blur(function () {
-			_check_input_value($input, $label);
+			_check_input_value($input, $label, options);
 			
 		// Quickly hide label on key down..
 		}).keydown(function (e) {
@@ -188,7 +193,7 @@
 			
 		// ..then check value and correct if we made a mistake
 		}).keyup(function () {
-			_check_input_value($input, $label);
+			_check_input_value($input, $label, options);
 			
 		});
 		
@@ -197,7 +202,7 @@
 		setTimeout(function () {
 			// Don't show if it is set to be hidden (with external JS or whatnot)
 			//var was_hidden = $label.css('display') === 'hidden' || !$label.width() || !$label.height();
-			_check_input_value($input, $label);
+			_check_input_value($input, $label, options);
 			
 			/*if (was_hidden) {
 				$label.hide();
